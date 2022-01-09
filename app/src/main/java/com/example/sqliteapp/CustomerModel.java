@@ -14,6 +14,7 @@ public class CustomerModel {
     }
 // empty constructor
     public CustomerModel() {
+
     }
 //to string
 

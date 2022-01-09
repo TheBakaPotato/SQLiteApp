@@ -4,11 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     Button btn_viewAll, btn_add;
@@ -29,15 +32,32 @@ public class MainActivity extends AppCompatActivity {
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CustomerModel customerModel = new CustomerModel(-1, et_name.getText().toString(), Integer.parseInt(et_age.getText().toString()), sw_active.isChecked());
-                Toast.makeText(MainActivity.this, customerModel.toString(), Toast.LENGTH_SHORT).show();
+                CustomerModel customerModel;
+                try{
+                    try {
+                        customerModel = new CustomerModel(-1, et_name.getText().toString(), Integer.parseInt(et_age.getText().toString()), sw_active.isChecked());
+                        Toast.makeText(MainActivity.this, customerModel.toString(), Toast.LENGTH_SHORT).show();
+                    }catch (Exception e){
+                        customerModel = new CustomerModel(-1, "error", 0,false);
+                        Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
 
+                    }
+
+                    DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
+                    Boolean success = dataBaseHelper.addOne(customerModel);
+                    Toast.makeText(MainActivity.this, "Operation result: "+success , Toast.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    Toast.makeText(MainActivity.this, "The error happens here", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         btn_viewAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "You clicked the View All Button", Toast.LENGTH_SHORT).show();                
+                DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
+                List<CustomerModel> everyone = dataBaseHelper.getEveryone();
+                
+                Toast.makeText(MainActivity.this, everyone.toString(), Toast.LENGTH_SHORT).show();
             }
         });
     }
