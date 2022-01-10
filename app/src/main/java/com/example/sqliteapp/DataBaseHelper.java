@@ -69,4 +69,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.close();
         return returnList;
     }
+    public boolean deletOne(CustomerModel customerModel){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "DELETE FROM "+ CUSTOMER_TABLE +" WHERE "+ COLLUM_CUSTOMER_ID +" = "+ customerModel.getId();
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()){
+            return true;
+        }else {
+            return false;
+        }
+    }
 }

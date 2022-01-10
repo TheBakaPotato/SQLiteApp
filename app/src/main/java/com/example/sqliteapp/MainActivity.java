@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     EditText et_name, et_age;
     Switch sw_active;
     ListView lv_customerList;
+    DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         et_name = findViewById(R.id.et_name);
         sw_active = findViewById(R.id.sw_active);
         lv_customerList = findViewById(R.id.lv_customerList);
-
+        fill_List();
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -49,16 +51,31 @@ public class MainActivity extends AppCompatActivity {
                 }catch (Exception e){
                     Toast.makeText(MainActivity.this, "The error happens here", Toast.LENGTH_SHORT).show();
                 }
+                fill_List();
             }
         });
         btn_viewAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
-                List<CustomerModel> everyone = dataBaseHelper.getEveryone();
-                
-                Toast.makeText(MainActivity.this, everyone.toString(), Toast.LENGTH_SHORT).show();
+                fill_List();
             }
         });
+        lv_customerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CustomerModel clickedCustomer = (CustomerModel) parent.getItemAtPosition(position);
+                dataBaseHelper.deletOne(clickedCustomer);
+                fill_List();
+                Toast.makeText(MainActivity.this, "You just deleted "+clickedCustomer.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fill_List() {
+        dataBaseHelper = new DataBaseHelper(MainActivity.this);
+        List<CustomerModel> everyone = dataBaseHelper.getEveryone();
+        ArrayAdapter customerArrayAdapter = new ArrayAdapter<CustomerModel>(MainActivity.this, android.R.layout.simple_list_item_1, everyone);
+        lv_customerList.setAdapter(customerArrayAdapter);
+        Toast.makeText(MainActivity.this, everyone.toString(), Toast.LENGTH_SHORT).show();
     }
 }
